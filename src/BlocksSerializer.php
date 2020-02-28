@@ -3,6 +3,7 @@
 namespace Beapi\Gutenberg;
 
 class BlocksSerializer {
+
 	/**
 	 * Transform parsed blocks into HTML for Gutenberg.
 	 * Supports nesting and classic.
@@ -12,15 +13,16 @@ class BlocksSerializer {
 	 * @return string : HTML content from block array.
 	 * @author Nicolas JUEN
 	 */
-	public static function from_array( array $content ) : string {
+	public static function from_array( array $content ): string {
 		$processed_content = '';
 		foreach ( $content as $block ) {
 			$processed_content .= self::process_block( $block );
 		}
+
 		return $processed_content;
 	}
 
-	private static function process_block( array $bloc, $is_inner = false ): string {
+	private static function process_block( array $bloc, bool $is_inner = false ): string {
 		$inner_content = '';
 
 		/**
@@ -47,10 +49,22 @@ class BlocksSerializer {
 			}
 		}
 
-		if ( 1 === count( $bloc['innerContent'] ) ) {
-			$inner_content = $bloc['innerHTML'];
+		$inner_content_count = count( $bloc['innerContent'] );
+		if ( 1 === $inner_content_count ) {
+			$inner_content = reset( $bloc['innerContent'] );
 		} else {
-			$inner_content = \reset( $bloc['innerContent'] ) . \implode( '', $inner_blocks ) . \end( $bloc['innerContent'] );
+			/**
+			 * Following the spec for the innerContent :
+			 *  @example array(
+			 *   'innerHTML'    => 'BeforeInnerAfter',
+			 *   'innerBlocks'  => array( block, block ),
+			 *   'innerContent' => array( 'Before', null, 'Inner', null, 'After' ),
+			 * )
+			 * Gluing the innerBlocks between them with the Inner entry if needed
+			 *
+			 */
+			$glue = $inner_content_count > 3 ? $bloc['innerContent'][2] : '';
+			$inner_content = reset( $bloc['innerContent'] ) . implode( $glue, $inner_blocks ) . end( $bloc['innerContent'] );
 		}
 
 		/**
@@ -58,16 +72,12 @@ class BlocksSerializer {
 		 * Eveyrthing else have wp:block_name
 		 */
 		$block_name = 'wp:' . ( false !== \strpos( $bloc['blockName'], 'core/' )
-				?
-				\str_replace( 'core/', '', $bloc['blockName'] )
-				:
-				$bloc['blockName'] );
-		$attributes = \json_encode( $bloc['attrs'], \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE );
+				? \str_replace( 'core/', '', $bloc['blockName'] )
+				: $bloc['blockName'] );
 
-		/**
-		 * Add line breaks as Gutenberg do.
-		 */
-		$after = false === $is_inner ? "\n\n" : '';
+		$attributes = ! empty( $bloc['attrs'] )
+			? \json_encode( $bloc['attrs'], \ JSON_FORCE_OBJECT | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE )
+			: '';
 
 		/**
 		 * Handle the single blocks without innerHTML.
@@ -84,7 +94,7 @@ class BlocksSerializer {
 		 */
 		$text_return = \sprintf( '<!-- %1$s %2$s -->', $block_name, $attributes );
 		$text_return .= $inner_content;
-		$text_return .= \sprintf( '<!-- /%1$s -->' . $after, $block_name );
+		$text_return .= \sprintf( '<!-- /%1$s -->', $block_name );
 
 		return $text_return;
 	}
