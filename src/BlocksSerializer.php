@@ -22,7 +22,7 @@ class BlocksSerializer {
 		return $processed_content;
 	}
 
-	private static function process_block( array $bloc, bool $is_inner = false ): string {
+	private static function process_block( array $bloc ): string {
 		$inner_content = '';
 
 		/**
@@ -45,7 +45,7 @@ class BlocksSerializer {
 		$inner_blocks = [];
 		if ( ! empty( $bloc['innerBlocks'] ) ) {
 			foreach ( $bloc['innerBlocks'] as $inner_block ) {
-				$inner_blocks[] = self::process_block( $inner_block, true );
+				$inner_blocks[] = self::process_block( $inner_block );
 			}
 		}
 
