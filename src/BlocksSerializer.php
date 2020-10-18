@@ -8,9 +8,9 @@ class BlocksSerializer {
 	 * Transform parsed blocks into HTML for Gutenberg.
 	 * Supports nesting and classic.
 	 *
-	 * @param array $content : The content from \parse_blocks function structure.
+	 * @param array $content The content from \parse_blocks function structure.
 	 *
-	 * @return string : HTML content from block array.
+	 * @return string HTML content from block array.
 	 * @author Nicolas JUEN
 	 */
 	public static function from_array( array $content ): string {
