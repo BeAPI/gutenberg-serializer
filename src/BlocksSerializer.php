@@ -76,7 +76,7 @@ class BlocksSerializer {
 				: $bloc['blockName'] );
 
 		$attributes = ! empty( $bloc['attrs'] )
-			? \json_encode( $bloc['attrs'], \ JSON_FORCE_OBJECT | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE )
+			? \json_encode( $bloc['attrs'], \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE )
 			: '';
 
 		/**
