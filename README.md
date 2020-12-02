@@ -9,25 +9,23 @@ The library supports innerBlocs.
 # Example
 ```php
 $bloc = [
+		[
+			'blockName'    => 'core/paragraph',
+			'attrs'        =>
 				[
-					'blockName'    => 'core/paragraph',
-					'attrs'        =>
-						[
-                'id' => 4
-						],
-					'innerBlocks'  =>
-						[],
-					'innerHTML'    => '
-<p>This is a content</p>
-',
-					'innerContent' =>
-						[
-							0 => '
-<p>This is a content</p>
-',
-						],
-				]
-]
+					'id' => 4
+				],
+			'innerBlocks'  => [],
+			'innerHTML'    => '
+				<p>This is a content</p>
+			',
+			'innerContent' => [
+				0 => '
+				<p>This is a content</p>
+				',
+			],
+		]
+];
 $content = BlocksSerializer::from_array( $bloc );
 ```
 
